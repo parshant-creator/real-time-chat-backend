@@ -12,6 +12,10 @@ connectDB();
 const authmiddleware = require("./middelware/authMiddleware");
 const userRoutes = require("./routes/userRoutes");
 
+app.get("/",(req,res)=>{
+  res.send("server is running successfully")
+})
+
 const http = require("http");
 const { Server } = require("socket.io");
 // app.get("/", async (req, res) => {

@@ -5,10 +5,18 @@ const chatModel = require("../models/chatModel");
 const sendMessage = async (req, res) => {
 
   try {
+const media = req.file
+  ? `http://localhost:4000/uploads/${req.file.filename}`
+  : "";
 
+const mediaType = req.file
+  ? req.file.mimetype.startsWith("video")
+    ? "video"
+    : "image"
+  : "";
     const { content, chatId } = req.body;
 
-    if (!content || !chatId) {
+    if (!content && !req.file || !chatId) {
 
       return res.status(400).json({
         success: false,
@@ -21,6 +29,8 @@ const sendMessage = async (req, res) => {
       sender: req.user.id,
       content,
       chat: chatId,
+      media,
+      mediaType,
     });
 
     message = await message.populate(

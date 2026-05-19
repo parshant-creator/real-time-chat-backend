@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
-
-const authMiddleware = (
+const userModel = require("../models/userModel")
+const authMiddleware = async (
   req,
   res,
   next
@@ -32,8 +32,17 @@ const authMiddleware = (
       token,
       process.env.JWT_SECRET
     );
+const user = await userModel.findById(
+  decoded.id
+);
 
-    req.user = decoded;
+if (!user) {
+  return res.status(401).json({
+    success: false,
+    message: "User no longer exists",
+  });
+}
+    req.user = user;
 
     next();
 

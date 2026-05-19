@@ -46,5 +46,101 @@ const getChats = async (req, res) =>{
             error:error.message
         })
     }
+};
+const createGroupChat = async (
+  req,
+  res
+) => {
+  try {
+   let{
+      chatName,
+      users
+    } = req.body;
+ if (!chatName || !users) {
+
+      return res.status(400).json({
+        success: false,
+        message:
+          "Please provide all fields",
+      });
+
+    }
+    if (!Array.isArray(users)) {
+
+      users = [users];
+
+    }
+ users.push(req.user.id);
+
+    const groupChat =
+      await chatModel.create({
+
+        chatName,
+
+        users,
+         isGroupChat: true,
+
+        groupAdmin: req.user.id,
+
+        groupIcon: req.file
+          ? `http://localhost:4000/uploads/${req.file.filename}`
+          : "",
+
+      });
+ const fullGroupChat =
+      await chatModel
+        .findById(groupChat._id)
+        .populate(
+          "users",
+          "-password"
+        )
+ .populate(
+          "groupAdmin",
+          "-password"
+        );
+
+    res.status(201).json(
+      fullGroupChat
+      
+    );
+
+  } catch (error) {
+
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+ }
+};
+
+const deleteGroup = async (req, res)=>{
+  try{
+    const {groupId} = req.params;
+    const group = await chatModel.findById(groupId);
+    if(!group){
+      return res.status(404).json({
+        success:false,
+        msg:"group not found"
+      })
+    }
+    if(
+      group.groupAdmin.toString() !== req.user.id)
+    {
+      return res.status(403).json({
+        success:false,
+        msg:"only admin can delete group"
+      })
+    }
+    await chatModel.findByIdAndDelete(groupId)
+    res.json({
+      success:true,
+      msg:"group is deleted"
+    })
+  }catch(error){
+    res.status(500).json({
+      error:error.message,
+      success:false
+    })
+  }
 }
-module.exports = { createChat, getChats };
+module.exports = { createChat, getChats, createGroupChat , deleteGroup }

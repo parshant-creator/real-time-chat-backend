@@ -1,5 +1,5 @@
 const express = require("express");
-
+const uploads = require("../middelware/multer")
 const router = express.Router();
 
 const authMiddleware = require("../middelware/authMiddleware");
@@ -12,6 +12,7 @@ const {
 router.post(
   "/",
   authMiddleware,
+  uploads.single('media'),
   sendMessage
 );
 

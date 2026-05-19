@@ -14,6 +14,17 @@ const messageSchema = mongoose.Schema({
     ref: "chat",
     required: true,
   },
+  media:{
+    type:String
+  },
+  mediaType:{
+    type:String
+  },
+  contact:{
+    name:String,
+    phone:String
+  }
+  ,
   date: {
     type: Date,
     default: Date.now,

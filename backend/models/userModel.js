@@ -18,12 +18,12 @@ const userSchema = new mongoose.Schema({
         type:String,
         required:[true,"Please provide a password"],
         minlength: [6, "Password must be at least 6 characters long"]
-    },
-    age:{
-        type:Number,
-        min:[1,"Age must be at least 1"],
-    },
+    },phone:{
+    type:String,
+    required: [true, 'please fill provide Number']
+}
 },
+
     {
        timestamps: true
     }

@@ -5,6 +5,7 @@ app.use(express.json());
 const cors = require("cors");
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
+app.use("/uploads", express.static("public/uploads"));
 const connectDB = require("./config/db");
 connectDB();
 // const User = require("./models/userModel");
@@ -62,7 +63,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("new message", (newMessageReceived) => {
-
     const chat = newMessageReceived.chat;
 
     if (!chat || !chat.users) {
@@ -70,23 +70,20 @@ io.on("connection", (socket) => {
     }
 
     chat.users.forEach((user) => {
-
-      if (
-        user._id ===
-        newMessageReceived.sender._id
-      ) {
+      if (user._id === newMessageReceived.sender._id) {
         return;
       }
 
-      io.to(user._id).emit(
-        "message received",
-        newMessageReceived
-      );
-
+      io.to(user._id).emit("message received", newMessageReceived);
     });
-
+  });
+  socket.on("typing", (room) => {
+    socket.in(room).emit("typing");
   });
 
+  socket.on("stop typing", (room) => {
+    socket.in(room).emit("stop typing");
+  });
 
   socket.on("disconnect", () => {
     console.log("disconnect");

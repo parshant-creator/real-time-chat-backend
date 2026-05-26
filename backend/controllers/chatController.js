@@ -70,7 +70,7 @@ const createGroupChat = async (req, res) => {
       groupAdmin: req.user.id,
 
       groupIcon: req.file
-        ? `http://localhost:4000/uploads/${req.file.filename}`
+        ? `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`
         : "",
     });
 

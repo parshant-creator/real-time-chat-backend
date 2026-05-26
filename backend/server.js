@@ -4,7 +4,7 @@ const app = express();
 app.use(express.json());
 const cors = require("cors");
 app.use(cors({
-  origin: "https://real-time-chat-frontend.vercel.app",
+   origin: "https://real-time-chat-frontend-ashy.vercel.app",
   credentials: true,
 }));
 app.use(express.urlencoded({ extended: true }));

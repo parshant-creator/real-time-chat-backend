@@ -6,7 +6,8 @@ const sendMessage = async (req, res) => {
 
   try {
 const media = req.file
-  ? `http://localhost:4000/uploads/${req.file.filename}`
+   ? `https://real-time-chat-backend-yx6a.onrender.com/uploads/${req.file.filename}`
+
   : "";
 
 const mediaType = req.file

@@ -70,8 +70,8 @@ const createGroupChat = async (req, res) => {
       groupAdmin: req.user.id,
 
       groupIcon: req.file
-        ? `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`
-        : "",
+  ? `https://real-time-chat-backend-yx6a.onrender.com/uploads/${req.file.filename}`
+  : "",
     });
 
     const fullGroupChat = await chatModel

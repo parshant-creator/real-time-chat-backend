@@ -54,7 +54,7 @@ const Port = process.env.PORT || 4000;
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "real-time-chat-frontend-ashy.vercel.app",
+    origin: "https://real-time-chat-frontend-ashy.vercel.app",
     credentials: true,
   },
 });

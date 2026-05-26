@@ -47,70 +47,45 @@ const getChats = async (req, res) =>{
         })
     }
 };
-const createGroupChat = async (
-  req,
-  res
-) => {
+const createGroupChat = async (req, res) => {
   try {
-   let{
-      chatName,
-      users
-    } = req.body;
- if (!chatName || !users) {
+    let { chatName, users } = req.body;
 
+    if (!chatName || !users) {
       return res.status(400).json({
         success: false,
-        message:
-          "Please provide all fields",
+        message: "Please provide all fields",
       });
-
     }
-    if (!Array.isArray(users)) {
 
-      users = [users];
+    // string -> array
+    users = JSON.parse(users);
 
-    }
- users.push(req.user.id);
+    users.push(req.user.id);
 
-    const groupChat =
-      await chatModel.create({
+    const groupChat = await chatModel.create({
+      chatName,
+      users,
+      isGroupChat: true,
+      groupAdmin: req.user.id,
 
-        chatName,
+      groupIcon: req.file
+        ? `http://localhost:4000/uploads/${req.file.filename}`
+        : "",
+    });
 
-        users,
-         isGroupChat: true,
+    const fullGroupChat = await chatModel
+      .findById(groupChat._id)
+      .populate("users", "-password")
+      .populate("groupAdmin", "-password");
 
-        groupAdmin: req.user.id,
-
-        groupIcon: req.file
-          ? `http://localhost:4000/uploads/${req.file.filename}`
-          : "",
-
-      });
- const fullGroupChat =
-      await chatModel
-        .findById(groupChat._id)
-        .populate(
-          "users",
-          "-password"
-        )
- .populate(
-          "groupAdmin",
-          "-password"
-        );
-
-    res.status(201).json(
-      fullGroupChat
-      
-    );
-
+    res.status(201).json(fullGroupChat);
   } catch (error) {
-
     res.status(500).json({
       success: false,
       error: error.message,
     });
- }
+  }
 };
 
 const deleteGroup = async (req, res)=>{

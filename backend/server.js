@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express");
+const path = require("path");
 const app = express();
 app.use(express.json());
 const cors = require("cors");
@@ -8,7 +9,7 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.urlencoded({ extended: true }));
-app.use("/uploads", express.static("public/uploads"));
+app.use("/uploads", express.static(path.join(__dirname,"public/uploads")));
 const connectDB = require("./config/db");
 connectDB();
 // const User = require("./models/userModel");

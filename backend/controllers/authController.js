@@ -1,6 +1,8 @@
 const User = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const path = require('path')
+const fs= require("fs")
 const register = async (req, res)=>{
     try{
         const {username, email, password, phone} =  req.body;
@@ -11,12 +13,17 @@ const register = async (req, res)=>{
         if(userExist){
             return res.status(400).json({msg: "User already exists"});
         }
+        let avtarUrl="https://real-time-chat-backend-yx6a.onrender.com/uploads/default.png";
+        if(req.file){
+            avtarUrl =`https://real-time-chat-backend-yx6a.onrender.com/uploads/${req.file.filename}`
+        }
         const hashedPassword = await bcrypt.hash(password, 10);
         const user  = await User.create({
             username,
             email,
             password: hashedPassword,
-            phone
+            phone,
+            avtar: avtarUrl
         })
         const token = jwt.sign({id: user._id},process.env.JWT_SECRET, {expiresIn: "1d"});
         res.status(201).json({
@@ -26,7 +33,8 @@ const register = async (req, res)=>{
                 id: user._id,
                 username: user.username,
                 email: user.email,
-                phone: user.phone
+                phone: user.phone,
+                avtar:user.avtar
             }
         })
     }catch (error) {
@@ -55,7 +63,8 @@ const Login = async (req, res) =>{
                 id: user._id,
                 username: user.username,
                 email: user.email,
-                phone: user.phone
+                phone: user.phone,
+                avtar: user.avtar
             }
         })
     }
@@ -67,4 +76,56 @@ const Logout = async(req, res) =>{
     res.clearCookie("token");
     res.status(200).json({msg:"Logout successful"});
 }
-module.exports = {register, Login, Logout};
+const updateUser = async (req, res) => {
+  try {
+
+    const oldUser = await User.findById(req.params.id);
+
+    const updateData = { ...req.body };
+
+    if (req.file) {
+
+      // old image delete
+      if (
+        oldUser.avtar &&
+        !oldUser.avtar.includes("default.png")
+      ) {
+
+        const oldImagePath = path.join(
+          __dirname,
+          "..",
+          "uploads",
+          oldUser.avtar.split("/uploads/")[1]
+        );
+
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath);
+        }
+      }
+
+      updateData.avtar =
+        `https://real-time-chat-backend-yx6a.onrender.com/uploads/${req.file.filename}`;
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      msg: "Profile updated",
+      user,
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+
+  }
+};
+module.exports = {register, Login, Logout , updateUser};

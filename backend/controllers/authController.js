@@ -79,13 +79,37 @@ const Logout = async(req, res) =>{
 const updateUser = async (req, res) => {
   try {
 
+    // only logged in user can update own profile
+    if (req.user._id.toString() !== req.params.id) {
+      return res.status(403).json({
+        success: false,
+        msg: "Unauthorized",
+      });
+    }
+
     const oldUser = await User.findById(req.params.id);
+
+    if (!oldUser) {
+      return res.status(404).json({
+        success: false,
+        msg: "User not found",
+      });
+    }
 
     const updateData = { ...req.body };
 
+    // hash password if updating password
+    if (updateData.password) {
+      updateData.password = await bcrypt.hash(
+        updateData.password,
+        10
+      );
+    }
+
+    // update avatar
     if (req.file) {
 
-      // old image delete
+      // delete old image
       if (
         oldUser.avtar &&
         !oldUser.avtar.includes("default.png")
@@ -94,6 +118,7 @@ const updateUser = async (req, res) => {
         const oldImagePath = path.join(
           __dirname,
           "..",
+          "public",
           "uploads",
           oldUser.avtar.split("/uploads/")[1]
         );
@@ -110,13 +135,22 @@ const updateUser = async (req, res) => {
     const user = await User.findByIdAndUpdate(
       req.params.id,
       updateData,
-      { new: true }
-    );
+      {
+        new: true,
+        runValidators: true,
+      }
+    ).select("-password");
 
     res.status(200).json({
       success: true,
-      msg: "Profile updated",
-      user,
+      msg: "Profile updated successfully",
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        phone: user.phone,
+        avtar: user.avtar,
+      },
     });
 
   } catch (error) {

@@ -25,25 +25,19 @@ const updateValidation = [
   body("username")
     .optional()
     .trim()
-    .isLength({ min: 3, max: 20 })
-    .withMessage("Username must be 3 to 20 characters"),
+    .isLength({ min: 3, max: 20 }),
 
   body("email")
     .optional()
-    .isEmail()
-    .withMessage("Valid email required"),
+    .isEmail(),
 
   body("password")
     .optional()
-    .isLength({ min: 6, max: 20 })
-    .withMessage("Password must be 6 to 20 characters"),
+    .isLength({ min: 6, max: 20 }),
 
   body("phone")
     .optional()
-    .isLength({ min: 10, max: 10 })
-    .withMessage("Phone must be 10 digits")
-    .isNumeric()
-    .withMessage("Phone must contain only numbers"),
+    .isLength({ min: 10, max: 10 }),
 ];
 
 module.exports = {

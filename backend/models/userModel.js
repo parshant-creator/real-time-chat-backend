@@ -26,6 +26,8 @@ const userSchema = new mongoose.Schema(
     },
     avtar:{
     type: String,
+     default:
+    "https://real-time-chat-backend-yx6a.onrender.com/uploads/default.png",
   }
 
   },

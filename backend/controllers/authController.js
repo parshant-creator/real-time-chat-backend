@@ -27,17 +27,16 @@ if (!errors.isEmpty()) {
     message: "User already exists",
   });
         }
-        let avtarUrl="https://real-time-chat-backend-yx6a.onrender.com/uploads/default.png";
-        if(req.file){
-            avtarUrl =`https://real-time-chat-backend-yx6a.onrender.com/uploads/${req.file.filename}`
-        }
+       
         const hashedPassword = await bcrypt.hash(password, 10);
         const user  = await User.create({
             username,
             email,
             password: hashedPassword,
             phone,
-            avtar: avtarUrl
+            avtar: req.file
+    ? `https://real-time-chat-backend-yx6a.onrender.com/uploads/${req.file.filename}`
+    : undefined,
         })
         const token = jwt.sign({id: user._id},process.env.JWT_SECRET, {expiresIn: "1d"});
         res.status(201).json({
